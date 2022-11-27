@@ -84,6 +84,9 @@ worldBox = new VBObox0();		  // Holds VBO & shaders for 3D 'world' ground-plane 
 gouraudBox = new VBObox1();		  // "  "  for first set of custom-shaded 3D parts
 phongBox = new VBObox2();     // "  "  for second set of custom-shaded 3D parts
 
+// For mode selection:-------------------
+var gouraudLightMode = document.getElementById('light-select');
+
 // For animation:---------------------
 var g_lastMS = Date.now();			// Timestamp (in milliseconds) for our 
 // most-recently-drawn WebGL screen contents.  
@@ -223,7 +226,7 @@ function main() {
     requestAnimationFrame(tick, g_canvasID); // browser callback request; wait
     // til browser is ready to re-draw canvas, then
     timerAll();  // Update all time-varying params, and
-    drawAll();                // Draw all the VBObox contents
+    drawAll(g_canvasID);                // Draw all the VBObox contents
   };
   //------------------------------------
   tick();                       // do it again!
@@ -283,15 +286,24 @@ function timerAll() {
 
 }
 
-function drawAll() {
+function drawAll(canvas) {
   //=============================================================================
   // Clear on-screen HTML-5 <canvas> object:
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  gl.viewport(0,  														// Viewport lower-left corner
+    0,															// (x,y) location(in pixels)
+    canvas.width, 				// viewport width, height.
+    canvas.height);
+
   var b4Draw = Date.now();
   var b4Wait = b4Draw - g_lastMS;
 
-  setCamera();
+  setCamera(canvas);
+
+  var xtraMargin = 16;    // keep a margin (otherwise, browser adds scroll-bars)
+  canvas.width = innerWidth - xtraMargin;
+  canvas.height = (innerHeight * 3 / 4) - xtraMargin;
 
   if (g_show0 == 1) {	// IF user didn't press HTML button to 'hide' VBO0:
     worldBox.switchToMe();  // Set WebGL to render from this VBObox.
@@ -300,12 +312,12 @@ function drawAll() {
   }
   if (g_show1 == 1) { // IF user didn't press HTML button to 'hide' VBO1:
     gouraudBox.switchToMe();  // Set WebGL to render from this VBObox.
-    gouraudBox.adjust();		  // Send new values for uniforms to the GPU, and
+    gouraudBox.adjust(px, py, pz, gouraudLightMode.value);		  // Send new values for uniforms to the GPU, and
     gouraudBox.draw();			  // draw our VBO's contents using our shaders.
   }
   if (g_show2 == 1) { // IF user didn't press HTML button to 'hide' VBO2:
     phongBox.switchToMe();  // Set WebGL to render from this VBObox.
-    phongBox.adjust();		  // Send new values for uniforms to the GPU, and
+    phongBox.adjust(px, py, pz);		  // Send new values for uniforms to the GPU, and
     phongBox.draw();			  // draw our VBO's contents using our shaders.
   }
   /* // ?How slow is our own code?  	
@@ -339,13 +351,13 @@ function VBO2toggle() {
   console.log('g_show2: ' + g_show2);
 }
 
-function setCamera() {
+function setCamera(canvas) {
   //============================================================================
   // PLACEHOLDER:  sets a fixed camera at a fixed position for use by
   // ALL VBObox objects.  REPLACE This with your own camera-control code.
   g_worldMat.setIdentity();
   g_worldMat.perspective(42.0,   // FOVY: top-to-bottom vertical image angle, in degrees
-    1.0,   // Image Aspect Ratio: camera lens width/height
+    canvas.width / canvas.height,   // Image Aspect Ratio: camera lens width/height
     1.0,   // camera z-near distance (always positive; frustum begins at z = -znear)
     200.0);  // camera z-far distance (always positive; frustum ends at z = -zfar)
 
