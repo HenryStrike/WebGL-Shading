@@ -10,21 +10,58 @@
   <canvas id="webgl" width="600" height="600">
     Please use a browser that supports "canvas"
   </canvas>
+  <div style="margin-bottom: 5px; text-align: center;">
+    "W" to move forward, "S" to move backward, "A" to look left, "D" to look right, "Shift" to tilt up and "Ctrl" to tilt down, "Q" to move left, "E" to move right, "R" to move upward, "F" to move downward
+  </div>
   <p>
     <button type="button" onclick="VBO0toggle()">VBO-0 hide/show</button>
     <button type="button" onclick="VBO1toggle()">VBO-1 hide/show</button>
     <button type="button" onclick="VBO2toggle()">VBO-2 hide/show</button>
+    <label for="shininess-select">Shininess:</label>
+    <span id="v-sh">32</span>
+    <input type="range" id="shininess-select" value="32" min="1" max="128" onchange="handleShine()">
   </p>
-  <div style="margin-bottom: 5px; text-align: center;">
-    <p>"W" to move forward, "S" to move backward, "A" to look left, "D" to look right, "Shift" to tilt up and "Ctrl" to tilt down, "Q" to move left, "E" to move right, "R" to move upward, "F" to move downward</p>
-  </div>
-  <div style="border: solid 1px #000000; padding: 10px">
-    <div style="font-size:larger">Gouraud Shading:</div>
-    <label for="light-select">Choose a Light:</label>
-    <select name="lights" id="light-select">
-      <option value="0">Phone Lighting</option>
-      <option value="1">Blinn-Phone Lighting</option>
-    </select>
+  <div style="display: flex; justify-content:space-evenly">
+    <div style="border: solid 1px #000000; padding: 10px; width: 45%;">
+      <label for="light-select">Choose Gouraud Shading Light:</label>
+      <select name="lights" id="light-select">
+        <option value="0">Phone Lighting</option>
+        <option value="1">Blinn-Phone Lighting</option>
+      </select>
+      <br>
+      <label for="ambient-select">Ambient reflection (ka):</label>
+      <span id="v-ka">1</span>
+      <input type="range" id="ambient-select" value="100" min="0" max="100" style="float: right;" onchange="handleKa()">
+      <br>
+      <label for="diffuse-select">Diffuse reflection (kd):</label>
+      <span id="v-kd">1</span>
+      <input type="range" id="diffuse-select" value="100" min="0" max="100" style="float: right;" onchange="handleKd()">
+      <br>
+      <label for="specular-select">Specular reflection (ks):</label>
+      <span id="v-ks">1</span>
+      <input type="range" id="specular-select" value="100" min="0" max="100" style="float: right;" onchange="handleKs()">
+    </div>
+    <div style="border: solid 1px #000000; padding: 10px; width: 45%;">
+      <label for="material-select">Choose Material:</label>
+      <select name="materials" id="material-select">
+        <option value="0">Red plastic</option>
+        <option value="1">Green plastic</option>
+        <option value="2">None</option>
+      </select>
+      <br>
+      <div>Light position:</div>
+      <label for="lgx-select">X:</label>
+      <span id="v-lx">0</span>
+      <input type="range" id="lgx-select" value="0" min="-10" max="10" style="float: right;" onchange="handleLx()">
+      <br>
+      <label for="lgy-select">Y:</label>
+      <span id="v-ly">0</span>
+      <input type="range" id="lgy-select" value="0" min="-10" max="10" style="float: right;" onchange="handleLy()">
+      <br>
+      <label for="lgz-select">Z:</label>
+      <span id="v-lz">0</span>
+      <input type="range" id="lgz-select" value="0" min="-10" max="10" style="float: right;" onchange="handleLz()">
+    </div>
   </div>
   <script src="lib/webgl-utils.js"></script>
   <script src="lib/webgl-debug.js"></script>

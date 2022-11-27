@@ -86,6 +86,16 @@ phongBox = new VBObox2();     // "  "  for second set of custom-shaded 3D parts
 
 // For mode selection:-------------------
 var gouraudLightMode = document.getElementById('light-select');
+var materialMode = document.getElementById('material-select');
+
+// For coefficient selection:---------------------------
+var shininess = 32;
+var ka = 100;
+var kd = 100;
+var ks = 100;
+var lg_x = 6.0;
+var lg_y = 5.0;
+var lg_z = 5.0;
 
 // For animation:---------------------
 var g_lastMS = Date.now();			// Timestamp (in milliseconds) for our 
@@ -305,6 +315,24 @@ function drawAll(canvas) {
   canvas.width = innerWidth - xtraMargin;
   canvas.height = (innerHeight * 3 / 4) - xtraMargin;
 
+  let mat = {
+    shininess,
+    ka : ka / 100,
+    kd : kd / 100,
+    ks : ks / 100,
+  }
+
+  let lig = {
+    x : lg_x,
+    y : lg_y,
+    z : lg_z,
+  }
+
+  let mode = {
+    light_mode : gouraudLightMode.value,
+    material_mode : materialMode.value,
+  }
+
   if (g_show0 == 1) {	// IF user didn't press HTML button to 'hide' VBO0:
     worldBox.switchToMe();  // Set WebGL to render from this VBObox.
     worldBox.adjust();		  // Send new values for uniforms to the GPU, and
@@ -312,12 +340,12 @@ function drawAll(canvas) {
   }
   if (g_show1 == 1) { // IF user didn't press HTML button to 'hide' VBO1:
     gouraudBox.switchToMe();  // Set WebGL to render from this VBObox.
-    gouraudBox.adjust(px, py, pz, gouraudLightMode.value);		  // Send new values for uniforms to the GPU, and
+    gouraudBox.adjust(px, py, pz, mode, mat, lig);		  // Send new values for uniforms to the GPU, and
     gouraudBox.draw();			  // draw our VBO's contents using our shaders.
   }
   if (g_show2 == 1) { // IF user didn't press HTML button to 'hide' VBO2:
     phongBox.switchToMe();  // Set WebGL to render from this VBObox.
-    phongBox.adjust(px, py, pz);		  // Send new values for uniforms to the GPU, and
+    phongBox.adjust(px, py, pz, mode, mat, lig);		  // Send new values for uniforms to the GPU, and
     phongBox.draw();			  // draw our VBO's contents using our shaders.
   }
   /* // ?How slow is our own code?  	
@@ -458,4 +486,53 @@ function keydown(ev) {
     default:
       return;
   }
+}
+
+function handleShine() {
+  let input = document.getElementById('shininess-select');
+  let value = document.getElementById('v-sh');
+  shininess = input.value;
+  value.innerHTML = shininess;
+}
+
+function handleKa() {
+  let input = document.getElementById('ambient-select');
+  let value = document.getElementById('v-ka');
+  ka = input.value;
+  value.innerHTML = ka / 100;
+}
+
+function handleKd() {
+  let input = document.getElementById('diffuse-select');
+  let value = document.getElementById('v-kd');
+  kd = input.value;
+  value.innerHTML = kd / 100;
+}
+
+function handleKs() {
+  let input = document.getElementById('specular-select');
+  let value = document.getElementById('v-ks');
+  ks = input.value;
+  value.innerHTML = ks / 100;
+}
+
+function handleLx() {
+  let input = document.getElementById('lgx-select');
+  let value = document.getElementById('v-lx');
+  lg_x = input.value;
+  value.innerHTML = lg_x;
+}
+
+function handleLy() {
+  let input = document.getElementById('lgy-select');
+  let value = document.getElementById('v-ly');
+  lg_y = input.value;
+  value.innerHTML = lg_y;
+}
+
+function handleLz() {
+  let input = document.getElementById('lgz-select');
+  let value = document.getElementById('v-lz');
+  lg_z = input.value;
+  value.innerHTML = lg_z;
 }
