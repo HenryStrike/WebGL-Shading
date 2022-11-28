@@ -333,6 +333,7 @@ function drawAll(canvas) {
     material_mode : materialMode.value,
   }
 
+  VBOtoggle();
   if (g_show0 == 1) {	// IF user didn't press HTML button to 'hide' VBO0:
     worldBox.switchToMe();  // Set WebGL to render from this VBObox.
     worldBox.adjust();		  // Send new values for uniforms to the GPU, and
@@ -355,28 +356,15 @@ function drawAll(canvas) {
   */
 }
 
-function VBO0toggle() {
-  //=============================================================================
-  // Called when user presses HTML-5 button 'Show/Hide VBO0'.
-  if (g_show0 != 1) g_show0 = 1;				// show,
-  else g_show0 = 0;										// hide.
-  console.log('g_show0: ' + g_show0);
-}
-
-function VBO1toggle() {
-  //=============================================================================
-  // Called when user presses HTML-5 button 'Show/Hide VBO1'.
-  if (g_show1 != 1) g_show1 = 1;			// show,
-  else g_show1 = 0;									// hide.
-  console.log('g_show1: ' + g_show1);
-}
-
-function VBO2toggle() {
-  //=============================================================================
-  // Called when user presses HTML-5 button 'Show/Hide VBO2'.
-  if (g_show2 != 1) g_show2 = 1;			// show,
-  else g_show2 = 0;									// hide.
-  console.log('g_show2: ' + g_show2);
+function VBOtoggle() {
+  let input = document.getElementById('shading-select');
+  if(input.value == 0) {
+    g_show1 = 1;
+    g_show2 = 0;
+  }else {
+    g_show1 = 0;
+    g_show2 = 1;
+  }
 }
 
 function setCamera(canvas) {
@@ -384,7 +372,7 @@ function setCamera(canvas) {
   // PLACEHOLDER:  sets a fixed camera at a fixed position for use by
   // ALL VBObox objects.  REPLACE This with your own camera-control code.
   g_worldMat.setIdentity();
-  g_worldMat.perspective(42.0,   // FOVY: top-to-bottom vertical image angle, in degrees
+  g_worldMat.perspective(30.0,   // FOVY: top-to-bottom vertical image angle, in degrees
     canvas.width / canvas.height,   // Image Aspect Ratio: camera lens width/height
     1.0,   // camera z-near distance (always positive; frustum begins at z = -znear)
     200.0);  // camera z-far distance (always positive; frustum ends at z = -zfar)

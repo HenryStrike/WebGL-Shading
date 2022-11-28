@@ -977,8 +977,7 @@ VBObox1.prototype.adjust = function (px, py, pz, mode, mat, lig) {
 
 
   this.ModelMatrix.setIdentity();
-  this.ModelMatrix.translate(1, -1, 0);
-  this.ModelMatrix.rotate(g_angleNow0, 0, 0, -1);
+  this.ModelMatrix.rotate(g_angleNow0, 0, 0, 1);
   this.MvpMatrix.set(g_worldMat);
   this.MvpMatrix.multiply(this.ModelMatrix);
 
@@ -1542,7 +1541,6 @@ VBObox2.prototype.adjust = function (px, py, pz, mode, mat, lig) {
 
   // Adjust values for our uniforms;-------------------------------------------
   this.modelMatrix.setIdentity();
-  this.modelMatrix.translate(-1, 1, 0);
   this.modelMatrix.rotate(g_angleNow0, 0, 0, 1);
   this.mvpMatrix.set(g_worldMat);
   this.mvpMatrix.multiply(this.modelMatrix);
