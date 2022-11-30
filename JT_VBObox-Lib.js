@@ -101,6 +101,7 @@ As each 'VBObox' object can contain:
 //      I decided there was too little 'common' code that wasn't customized.
 //=============================================================================
 
+
 function makeGroundGrid() {
   //==============================================================================
   // Create a list of vertices that create a large grid of lines in the x,y plane
@@ -109,8 +110,8 @@ function makeGroundGrid() {
   var xcount = 100;			// # of lines to draw in x,y to make the grid.
   var ycount = 100;
   var xymax = 50.0;			// grid size; extends to cover +/-xymax in x and y.
-  var xColr = new Float32Array([1.0, 1.0, 0.3]);	// bright yellow
-  var yColr = new Float32Array([0.5, 1.0, 0.5]);	// bright green.
+  var xColr = new Float32Array([0.0, 0.0, 1.0]);	// bright yellow
+  var yColr = new Float32Array([0.0, 1.0, 0.5]);	// bright green.
 
   // Create an (global) array to hold this ground-plane's vertices:
   var gndVerts = new Float32Array(7 * 2 * (xcount + ycount));
@@ -587,8 +588,7 @@ function VBObox1() {
     '  vec3 reflcDir = reflect(-lightDirection, normal);\n' +
     '  float spec = pow(max(dot(reflcDir, veiwDir), 0.0), u_MatlSet[0].shiny);\n' +
     '  specLight = u_LampSet[0].spec * spec * u_MatlSet[0].spec;\n' +
-    '  }\n' +
-    '  else{\n' +
+    '  }else{\n' +
     // Reflect--2.blinn-phone
     '  vec3 H = (lightDirection + veiwDir) / abs(length(lightDirection) + length(veiwDir));\n' +
     '  float spec = pow(max(dot(normal, H), 0.0), u_MatlSet[0].shiny);\n' +
@@ -643,6 +643,8 @@ function VBObox1() {
   this.matl0 = new Material(this.matlSel);
   this.matlSel = MATL_GRN_PLASTIC;				// see keypress(): 'm' key changes matlSel
   this.matl1 = new Material(this.matlSel);
+  this.matlSel = MATL_BLU_PLASTIC;				// see keypress(): 'm' key changes matlSel
+  this.matl2 = new Material(this.matlSel);
 };
 
 
@@ -909,7 +911,6 @@ VBObox1.prototype.switchToMe = function () {
     this.vboStride,// Stride == #bytes we must skip in the VBO to move from the
     this.vboOffset_a_Pos0);
 
-
   // // --Enable this assignment of each of these attributes to its' VBO source:
   // gl.enableVertexAttribArray(this.a_PosLoc);
 }
@@ -961,25 +962,218 @@ VBObox1.prototype.adjust = function (px, py, pz, mode, mat, lig) {
   //---------------For the Material object(s):
   gl.uniform3fv(this.matl0.uLoc_Ke, this.matl0.K_emit.slice(0, 3));				// Ke emissive
   if (mode.material_mode == 0) {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl0.K_ambi[0] * mat.ka, this.matl0.K_ambi[1] * mat.ka, this.matl0.K_ambi[2] * mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl0.K_diff[0] * mat.kd, this.matl0.K_diff[1] * mat.kd, this.matl0.K_diff[2] * mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl0.K_spec[0] * mat.ks, this.matl0.K_spec[1] * mat.ks, this.matl0.K_spec[2] * mat.ks]);				// Ks specular
-  }else if(mode.material_mode == 1) {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl1.K_ambi[0] * mat.ka, this.matl1.K_ambi[1] * mat.ka, this.matl1.K_ambi[2] * mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl1.K_diff[0] * mat.kd, this.matl1.K_diff[1] * mat.kd, this.matl1.K_diff[2] * mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl1.K_spec[0] * mat.ks, this.matl1.K_spec[1] * mat.ks, this.matl1.K_spec[2] * mat.ks]);				// Ks specular
-  }else {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [mat.ka, mat.ka, mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [mat.kd, mat.kd, mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [mat.ks, mat.ks, mat.ks]);
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl0.K_ambi[0] * mat.kar, this.matl0.K_ambi[1] * mat.kag, this.matl0.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl0.K_diff[0] * mat.kdr, this.matl0.K_diff[1] * mat.kdg, this.matl0.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl0.K_spec[0] * mat.ksr, this.matl0.K_spec[1] * mat.ksg, this.matl0.K_spec[2] * mat.ksb]);				// Ks specular
+  } else if (mode.material_mode == 1) {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl1.K_ambi[0] * mat.kar, this.matl1.K_ambi[1] * mat.kag, this.matl1.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl1.K_diff[0] * mat.kdr, this.matl1.K_diff[1] * mat.kdg, this.matl1.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl1.K_spec[0] * mat.ksr, this.matl1.K_spec[1] * mat.ksg, this.matl1.K_spec[2] * mat.ksb]);				// Ks specular
+  } else if (mode.material_mode == 2) {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl2.K_ambi[0] * mat.kar, this.matl2.K_ambi[1] * mat.kag, this.matl2.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl2.K_diff[0] * mat.kdr, this.matl2.K_diff[1] * mat.kdg, this.matl2.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl2.K_spec[0] * mat.ksr, this.matl2.K_spec[1] * mat.ksg, this.matl2.K_spec[2] * mat.ksb]);				// Ks specular
+  } else {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [mat.kar, mat.kag, mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [mat.kdr, mat.kdg, mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [mat.ksr, mat.ksg, mat.ksb]);
   }
   gl.uniform1f(this.matl0.uLoc_Kshiny, mat.shininess);     // Kshiny 
+
+  // new model
+  this.ModelMatrix.setIdentity();
+  this.ModelMatrix.translate(-5.0, -5.0, 0.0);
+  this.ModelMatrix.rotate(g_angleNow1 * 0.4 + g_angleNow2, 0, 0, 1);
+  pushMatrix(this.ModelMatrix);
+  this.ModelMatrix.scale(0.1, 0.1, 1.0);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+  pushMatrix(this.ModelMatrix); // First Joint
+  this.ModelMatrix.translate(0.0, 0.0, 1.0);
+  this.ModelMatrix.rotate(g_angleNow1 / 2 + 90, 1, 0, 0);
+  this.ModelMatrix.translate(0.0, -2.0, 0.0);
+  pushMatrix(this.ModelMatrix);
+  this.ModelMatrix.scale(0.1, 2.0, 0.1);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+  this.ModelMatrix.translate(0.0, -2.0, 0.0);
+  this.ModelMatrix.rotate(g_angleNow1 * 0.3, 1, 0, 0);
+  this.ModelMatrix.translate(0.0, 2.0, 0.0);
+  this.ModelMatrix.scale(0.1, 2.0, 0.1);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+
+    // new model
+    this.ModelMatrix.setIdentity();
+    this.ModelMatrix.translate(-5.0, 5.0, 0.0);
+    this.ModelMatrix.rotate(g_angleNow0 + g_angleNow2 / 2, 0, 0, 1);
+    pushMatrix(this.ModelMatrix);
+  this.ModelMatrix.scale(0.3, 0.3, 1.0);
+    this.MvpMatrix.set(g_worldMat);
+    this.MvpMatrix.multiply(this.ModelMatrix);
+    this.NormalMatrix.setInverseOf(this.ModelMatrix);
+    this.NormalMatrix.transpose();
+    gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.ModelMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.MvpMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.NormalMatrix.elements);	// send data from Javascript.
+    this.draw();
+    this.ModelMatrix = popMatrix();
+    pushMatrix(this.ModelMatrix); // First Joint
+    this.ModelMatrix.translate(0.0, 0.0, 1.0);
+    this.ModelMatrix.rotate(g_angleNow1 * 2 + 90, 1, 0, 0);
+    this.ModelMatrix.translate(0.0, -2.0, 0.0);
+    pushMatrix(this.ModelMatrix);
+    this.ModelMatrix.scale(0.3, 2.0, 0.3);
+    this.MvpMatrix.set(g_worldMat);
+    this.MvpMatrix.multiply(this.ModelMatrix);
+    this.NormalMatrix.setInverseOf(this.ModelMatrix);
+    this.NormalMatrix.transpose();
+    gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.ModelMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.MvpMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.NormalMatrix.elements);	// send data from Javascript.
+    this.draw();
+    this.ModelMatrix = popMatrix(); 
+    this.ModelMatrix.translate(0.0, -2.0, 0.0);
+    this.ModelMatrix.rotate(g_angleNow1 + g_angleNow2, 1, 0, 0);
+    this.ModelMatrix.translate(0.0, 2.0, 0.0);
+    this.ModelMatrix.scale(0.3, 2.0, 0.3);
+    this.MvpMatrix.set(g_worldMat);
+    this.MvpMatrix.multiply(this.ModelMatrix);
+    this.NormalMatrix.setInverseOf(this.ModelMatrix);
+    this.NormalMatrix.transpose();
+    gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.ModelMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.MvpMatrix.elements);	// send data from Javascript.
+  gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+    false, 										// use matrix transpose instead?
+    this.NormalMatrix.elements);	// send data from Javascript.
+    this.draw();
+    this.ModelMatrix = popMatrix(); 
+
+      // new model
+  this.ModelMatrix.setIdentity();
+  this.ModelMatrix.translate(5.0, -5.0, 0.0);
+  this.ModelMatrix.rotate(g_angleNow1, 0, 0, 1);
+  pushMatrix(this.ModelMatrix);
+  this.ModelMatrix.scale(0.5, 0.5, 1.0);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+  pushMatrix(this.ModelMatrix); // First Joint
+  this.ModelMatrix.translate(0.0, 0.0, 1.0);
+  this.ModelMatrix.rotate(g_angleNow2 + 90, 1, 0, 0);
+  this.ModelMatrix.translate(0.0, -2.0, 0.0);
+  pushMatrix(this.ModelMatrix);
+  this.ModelMatrix.scale(0.5, 2.0, 0.5);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+  this.ModelMatrix.translate(0.0, -2.0, 0.0);
+  this.ModelMatrix.rotate(g_angleNow1, 1, 0, 0);
+  this.ModelMatrix.translate(0.0, 2.0, 0.0);
+  this.ModelMatrix.scale(0.5, 2.0, 0.5);
+  this.MvpMatrix.set(g_worldMat);
+  this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
+  gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.ModelMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.MvpMatrix.elements);	// send data from Javascript.
+gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+  false, 										// use matrix transpose instead?
+  this.NormalMatrix.elements);	// send data from Javascript.
+  this.draw();
+  this.ModelMatrix = popMatrix(); 
+
 
 
   this.ModelMatrix.setIdentity();
   this.ModelMatrix.rotate(g_angleNow0, 0, 0, 1);
   this.MvpMatrix.set(g_worldMat);
   this.MvpMatrix.multiply(this.ModelMatrix);
+  this.NormalMatrix.setInverseOf(this.ModelMatrix);
+  this.NormalMatrix.transpose();
 
   //  this.ModelMatrix.rotate(g_angleNow1, 0, 0, 1);	// -spin drawing axes,
   //this.ModelMatrix.translate(1.0, -2.0, 0);						// then translate them.
@@ -991,13 +1185,9 @@ VBObox1.prototype.adjust = function (px, py, pz, mode, mat, lig) {
   gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
     false, 										// use matrix transpose instead?
     this.MvpMatrix.elements);	// send data from Javascript.
-
-  this.NormalMatrix.setInverseOf(this.ModelMatrix);
-  this.NormalMatrix.transpose();
   gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
     false, 										// use matrix transpose instead?
     this.NormalMatrix.elements);	// send data from Javascript.
-
 }
 
 VBObox1.prototype.draw = function () {
@@ -1144,6 +1334,7 @@ function VBObox2() {
     'uniform MatlT u_MatlSet[1];\n' +		// Array of all materials.
     //
     'uniform vec3 u_eyePosWorld; \n' + 	// Camera/eye location in world coords.
+    'uniform int u_lightMode; \n' +
 
     //-------------VARYING:Vertex Shader values sent per-pixel to Fragment shader: 
     'varying vec3 v_Normal;\n' +				// Find 3D surface normal at each pix
@@ -1170,19 +1361,24 @@ function VBObox2() {
     // where 'halfway' vector H has a direction half-way between L and V
     // H = norm(norm(V) + norm(L)).  Note L & V already normalized above.
     // (see http://en.wikipedia.org/wiki/Blinn-Phong_shading_model)
+    'vec3 speculr = vec3(1.0);\n' +
+    // Reflect--1.phone
+    '  if(u_lightMode == 0){\n' +
+    '  vec3 reflcDir = reflect(-lightDirection, normal);\n' +
+    '  float spec = pow(max(dot(reflcDir, eyeDirection), 0.0), float(u_MatlSet[0].shiny));\n' +
+    '  speculr = u_LampSet[0].spec * spec * u_MatlSet[0].spec;\n' +
+    '  }else{\n' +
+    // Reflect--2.blinn-phone
     '  vec3 H = normalize(lightDirection + eyeDirection); \n' +
     '  float nDotH = max(dot(H, normal), 0.0); \n' +
-    // (use max() to discard any negatives from lights below the surface)
-    // Apply the 'shininess' exponent K_e:
-    // Try it two different ways:		The 'new hotness': pow() fcn in GLSL.
-    // CAREFUL!  pow() won't accept integer exponents! Convert K_shiny!  
-    '  float e64 = pow(nDotH, float(u_MatlSet[0].shiny));\n' +
+    '  float spec = pow(nDotH, float(u_MatlSet[0].shiny));\n' +
+    '	 speculr = u_LampSet[0].spec * u_MatlSet[0].spec * spec;\n' +
+    '  }\n' +
     // Calculate the final color from diffuse reflection and ambient reflection
     //  '	 vec3 emissive = u_Ke;' +
     '	 vec3 emissive = 										u_MatlSet[0].emit;' +
     '  vec3 ambient = u_LampSet[0].ambi * u_MatlSet[0].ambi;\n' +
     '  vec3 diffuse = u_LampSet[0].diff * v_Kd * nDotL;\n' +
-    '	 vec3 speculr = u_LampSet[0].spec * u_MatlSet[0].spec * e64;\n' +
     '  gl_FragColor = vec4(emissive + ambient + diffuse + speculr , 1.0);\n' +
     '}\n';
 
@@ -1220,6 +1416,8 @@ function VBObox2() {
   this.matl0 = new Material(this.matlSel);
   this.matlSel = MATL_GRN_PLASTIC;				// see keypress(): 'm' key changes matlSel
   this.matl1 = new Material(this.matlSel);
+  this.matlSel = MATL_BLU_PLASTIC;				// see keypress(): 'm' key changes matlSel
+  this.matl2 = new Material(this.matlSel);
 };
 
 
@@ -1346,6 +1544,12 @@ VBObox2.prototype.init = function () {
   if (!this.uLoc_eyePosWorld) {
     console.log(this.constructor.name +
       '.init() failed to get GPU location for u_eyePosWorld uniform');
+    return;
+  }
+  this.u_lightModeLoc = gl.getUniformLocation(this.shaderLoc, 'u_lightMode');
+  if (!this.u_lightModeLoc) {
+    console.log(this.constructor.name +
+      '.init() failed to get GPU location for u_lightMode uniform');
     return;
   }
   this.uLoc_ModelMatrix = gl.getUniformLocation(this.shaderLoc, 'u_ModelMatrix');
@@ -1511,6 +1715,7 @@ VBObox2.prototype.adjust = function (px, py, pz, mode, mat, lig) {
 
   this.eyePosWorld.set([px, py, pz]);
   gl.uniform3fv(this.uLoc_eyePosWorld, this.eyePosWorld);// use it to set our uniform
+  gl.uniform1i(this.u_lightModeLoc, mode.light_mode);
   // Init World-coord. position & colors of first light source in global vars;
   this.lamp0.I_pos.elements.set([lig.x, lig.y, lig.z]);
   this.lamp0.I_ambi.elements.set([0.4, 0.4, 0.4]);
@@ -1525,19 +1730,209 @@ VBObox2.prototype.adjust = function (px, py, pz, mode, mat, lig) {
   //---------------For the Material object(s):
   gl.uniform3fv(this.matl0.uLoc_Ke, this.matl0.K_emit.slice(0, 3));				// Ke emissive
   if (mode.material_mode == 0) {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl0.K_ambi[0] * mat.ka, this.matl0.K_ambi[1] * mat.ka, this.matl0.K_ambi[2] * mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl0.K_diff[0] * mat.kd, this.matl0.K_diff[1] * mat.kd, this.matl0.K_diff[2] * mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl0.K_spec[0] * mat.ks, this.matl0.K_spec[1] * mat.ks, this.matl0.K_spec[2] * mat.ks]);				// Ks specular
-  }else if(mode.material_mode == 1) {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl1.K_ambi[0] * mat.ka, this.matl1.K_ambi[1] * mat.ka, this.matl1.K_ambi[2] * mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl1.K_diff[0] * mat.kd, this.matl1.K_diff[1] * mat.kd, this.matl1.K_diff[2] * mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl1.K_spec[0] * mat.ks, this.matl1.K_spec[1] * mat.ks, this.matl1.K_spec[2] * mat.ks]);				// Ks specular
-  }else {
-    gl.uniform3fv(this.matl0.uLoc_Ka, [mat.ka, mat.ka, mat.ka]);				// Ka ambient
-    gl.uniform3fv(this.matl0.uLoc_Kd, [mat.kd, mat.kd, mat.kd]);				// Kd	diffuse
-    gl.uniform3fv(this.matl0.uLoc_Ks, [mat.ks, mat.ks, mat.ks]);
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl0.K_ambi[0] * mat.kar, this.matl0.K_ambi[1] * mat.kag, this.matl0.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl0.K_diff[0] * mat.kdr, this.matl0.K_diff[1] * mat.kdg, this.matl0.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl0.K_spec[0] * mat.ksr, this.matl0.K_spec[1] * mat.ksg, this.matl0.K_spec[2] * mat.ksb]);				// Ks specular
+  } else if (mode.material_mode == 1) {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl1.K_ambi[0] * mat.kar, this.matl1.K_ambi[1] * mat.kag, this.matl1.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl1.K_diff[0] * mat.kdr, this.matl1.K_diff[1] * mat.kdg, this.matl1.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl1.K_spec[0] * mat.ksr, this.matl1.K_spec[1] * mat.ksg, this.matl1.K_spec[2] * mat.ksb]);				// Ks specular
+  } else if (mode.material_mode == 2) {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [this.matl2.K_ambi[0] * mat.kar, this.matl2.K_ambi[1] * mat.kag, this.matl2.K_ambi[2] * mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [this.matl2.K_diff[0] * mat.kdr, this.matl2.K_diff[1] * mat.kdg, this.matl2.K_diff[2] * mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [this.matl2.K_spec[0] * mat.ksr, this.matl2.K_spec[1] * mat.ksg, this.matl2.K_spec[2] * mat.ksb]);				// Ks specular
+  } else {
+    gl.uniform3fv(this.matl0.uLoc_Ka, [mat.kar, mat.kag, mat.kab]);				// Ka ambient
+    gl.uniform3fv(this.matl0.uLoc_Kd, [mat.kdr, mat.kdg, mat.kdb]);				// Kd	diffuse
+    gl.uniform3fv(this.matl0.uLoc_Ks, [mat.ksr, mat.ksg, mat.ksb]);
   }
   gl.uniform1i(this.matl0.uLoc_Kshiny, mat.shininess);     // Kshiny 
+
+//   // new model
+//   this.modelMatrix.setIdentity();
+//   this.modelMatrix.translate(-5.0, -5.0, 0.0);
+//   this.modelMatrix.rotate(g_angleNow1 * 0.4 + g_angleNow2, 0, 0, 1);
+//   pushMatrix(this.modelMatrix);
+//   this.modelMatrix.scale(0.1, 0.1, 1.0);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
+//   pushMatrix(this.modelMatrix); // First Joint
+//   this.modelMatrix.translate(0.0, 0.0, 1.0);
+//   this.modelMatrix.rotate(g_angleNow1 / 2 + 90, 1, 0, 0);
+//   this.modelMatrix.translate(0.0, -2.0, 0.0);
+//   pushMatrix(this.modelMatrix);
+//   this.modelMatrix.scale(0.1, 2.0, 0.1);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
+//   this.modelMatrix.translate(0.0, -2.0, 0.0);
+//   this.modelMatrix.rotate(g_angleNow1 * 0.3, 1, 0, 0);
+//   this.modelMatrix.translate(0.0, 2.0, 0.0);
+//   this.modelMatrix.scale(0.1, 2.0, 0.1);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
+
+//     // new model
+//     this.modelMatrix.setIdentity();
+//     this.modelMatrix.translate(-5.0, 5.0, 0.0);
+//     this.modelMatrix.rotate(g_angleNow0 + g_angleNow2 / 2, 0, 0, 1);
+//     pushMatrix(this.modelMatrix);
+//   this.modelMatrix.scale(0.3, 0.3, 1.0);
+//     this.mvpMatrix.set(g_worldMat);
+//     this.mvpMatrix.multiply(this.modelMatrix);
+//     this.normalMatrix.setInverseOf(this.modelMatrix);
+//     this.normalMatrix.transpose();
+//     gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.modelMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.mvpMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.normalMatrix.elements);	// send data from Javascript.
+//     this.draw();
+//     this.modelMatrix = popMatrix();
+//     pushMatrix(this.modelMatrix); // First Joint
+//     this.modelMatrix.translate(0.0, 0.0, 1.0);
+//     this.modelMatrix.rotate(g_angleNow1 * 2 + 90, 1, 0, 0);
+//     this.modelMatrix.translate(0.0, -2.0, 0.0);
+//     pushMatrix(this.modelMatrix);
+//     this.modelMatrix.scale(0.3, 2.0, 0.3);
+//     this.mvpMatrix.set(g_worldMat);
+//     this.mvpMatrix.multiply(this.modelMatrix);
+//     this.normalMatrix.setInverseOf(this.modelMatrix);
+//     this.normalMatrix.transpose();
+//     gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.modelMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.mvpMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.normalMatrix.elements);	// send data from Javascript.
+//     this.draw();
+//     this.modelMatrix = popMatrix(); 
+//     this.modelMatrix.translate(0.0, -2.0, 0.0);
+//     this.modelMatrix.rotate(g_angleNow1 + g_angleNow2, 1, 0, 0);
+//     this.modelMatrix.translate(0.0, 2.0, 0.0);
+//     this.modelMatrix.scale(0.3, 2.0, 0.3);
+//     this.mvpMatrix.set(g_worldMat);
+//     this.mvpMatrix.multiply(this.modelMatrix);
+//     this.normalMatrix.setInverseOf(this.modelMatrix);
+//     this.normalMatrix.transpose();
+//     gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.modelMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.mvpMatrix.elements);	// send data from Javascript.
+//   gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//     false, 										// use matrix transpose instead?
+//     this.normalMatrix.elements);	// send data from Javascript.
+//     this.draw();
+//     this.modelMatrix = popMatrix(); 
+
+//       // new model
+//   this.modelMatrix.setIdentity();
+//   this.modelMatrix.translate(5.0, -5.0, 0.0);
+//   this.modelMatrix.rotate(g_angleNow1, 0, 0, 1);
+//   pushMatrix(this.modelMatrix);
+//   this.modelMatrix.scale(0.5, 0.5, 1.0);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
+//   pushMatrix(this.modelMatrix); // First Joint
+//   this.modelMatrix.translate(0.0, 0.0, 1.0);
+//   this.modelMatrix.rotate(g_angleNow2 + 90, 1, 0, 0);
+//   this.modelMatrix.translate(0.0, -2.0, 0.0);
+//   pushMatrix(this.modelMatrix);
+//   this.modelMatrix.scale(0.5, 2.0, 0.5);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
+//   this.modelMatrix.translate(0.0, -2.0, 0.0);
+//   this.modelMatrix.rotate(g_angleNow1, 1, 0, 0);
+//   this.modelMatrix.translate(0.0, 2.0, 0.0);
+//   this.modelMatrix.scale(0.5, 2.0, 0.5);
+//   this.mvpMatrix.set(g_worldMat);
+//   this.mvpMatrix.multiply(this.modelMatrix);
+//   this.normalMatrix.setInverseOf(this.modelMatrix);
+//   this.normalMatrix.transpose();
+//   gl.uniformMatrix4fv(this.u_ModelMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.modelMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_MvpMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.mvpMatrix.elements);	// send data from Javascript.
+// gl.uniformMatrix4fv(this.u_NormalMatrixLoc,	// GPU location of the uniform
+//   false, 										// use matrix transpose instead?
+//   this.normalMatrix.elements);	// send data from Javascript.
+//   this.draw();
+//   this.modelMatrix = popMatrix(); 
 
   // Adjust values for our uniforms;-------------------------------------------
   this.modelMatrix.setIdentity();

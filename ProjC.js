@@ -90,9 +90,15 @@ var materialMode = document.getElementById('material-select');
 
 // For coefficient selection:---------------------------
 var shininess = 32;
-var ka = 100;
-var kd = 100;
-var ks = 100;
+var kar = 100;
+var kdr = 100;
+var ksr = 100;
+var kag = 100;
+var kdg = 100;
+var ksg = 100;
+var kab = 100;
+var kdb = 100;
+var ksb = 100;
 var lg_x = 6.0;
 var lg_y = 5.0;
 var lg_z = 5.0;
@@ -134,8 +140,8 @@ var g_show2 = 1;                //  "         "     VBO2    "       "       "
 
 var speed = 10.0;
 var rspeed = 1.0;
-var px = 5.0;
-var py = 5.0;
+var px = 13.0;
+var py = 13.0;
 var pz = 3.0;
 var tx = 0.0;
 var ty = 0.0;
@@ -177,7 +183,7 @@ function main() {
     console.log('Failed to get the rendering context for WebGL');
     return;
   }
-  gl.clearColor(0.2, 0.2, 0.2, 1);	  // RGBA color for clearing <canvas>
+  gl.clearColor(0.0, 0.0, 0.0, 1);	  // RGBA color for clearing <canvas>
 
   gl.enable(gl.DEPTH_TEST);
 
@@ -317,9 +323,15 @@ function drawAll(canvas) {
 
   let mat = {
     shininess,
-    ka : ka / 100,
-    kd : kd / 100,
-    ks : ks / 100,
+    kar : kar / 100,
+    kdr : kdr / 100,
+    ksr : ksr / 100,
+    kag : kag / 100,
+    kdg : kdg / 100,
+    ksg : ksg / 100,
+    kab : kab / 100,
+    kdb : kdb / 100,
+    ksb : ksb / 100,
   }
 
   let lig = {
@@ -483,25 +495,49 @@ function handleShine() {
   value.innerHTML = shininess;
 }
 
-function handleKa() {
-  let input = document.getElementById('ambient-select');
-  let value = document.getElementById('v-ka');
-  ka = input.value;
-  value.innerHTML = ka / 100;
+function handleKar() {
+  let input = document.getElementById('ambient-selectr');
+  kar = input.value;
 }
 
-function handleKd() {
-  let input = document.getElementById('diffuse-select');
-  let value = document.getElementById('v-kd');
-  kd = input.value;
-  value.innerHTML = kd / 100;
+function handleKdr() {
+  let input = document.getElementById('diffuse-selectr');
+  kdr = input.value;
 }
 
-function handleKs() {
-  let input = document.getElementById('specular-select');
-  let value = document.getElementById('v-ks');
-  ks = input.value;
-  value.innerHTML = ks / 100;
+function handleKsr() {
+  let input = document.getElementById('specular-selectr');
+  ksr = input.value;
+}
+
+function handleKag() {
+  let input = document.getElementById('ambient-selectg');
+  kag = input.value;
+}
+
+function handleKdg() {
+  let input = document.getElementById('diffuse-selectg');
+  kdg = input.value;
+}
+
+function handleKsg() {
+  let input = document.getElementById('specular-selectg');
+  ksg = input.value;
+}
+
+function handleKab() {
+  let input = document.getElementById('ambient-selectb');
+  kab = input.value;
+}
+
+function handleKdb() {
+  let input = document.getElementById('diffuse-selectb');
+  kdb = input.value;
+}
+
+function handleKsb() {
+  let input = document.getElementById('specular-selectb');
+  ksb = input.value;
 }
 
 function handleLx() {

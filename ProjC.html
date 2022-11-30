@@ -22,7 +22,7 @@
         <option value="1">Phone Shading</option>
       </select>
       <br>
-      <label for="light-select">Choose Gouraud Shading Light:</label>
+      <label for="light-select">Choose Light:</label>
       <select name="lights" id="light-select">
         <option value="0">Phone Lighting</option>
         <option value="1">Blinn-Phone Lighting</option>
@@ -30,27 +30,37 @@
       <br>
       <label for="shininess-select">Shininess:</label>
       <span id="v-sh">32</span>
-      <input type="range" id="shininess-select" value="32" min="1" max="128" style="float: right;" onchange="handleShine()">
+      <input type="range" id="shininess-select" value="32" min="1" max="128" style="float: right;"
+        onchange="handleShine()">
       <br>
       <label for="ambient-select">Ambient reflection (ka):</label>
-      <span id="v-ka">1</span>
-      <input type="range" id="ambient-select" value="100" min="0" max="100" style="float: right;" onchange="handleKa()">
+      <div style="float: right; display: flex;">
+        R<input type="range" id="ambient-selectr" value="100" min="0" max="100" onchange="handleKar()">
+        G<input type="range" id="ambient-selectg" value="100" min="0" max="100" onchange="handleKag()">
+        B<input type="range" id="ambient-selectb" value="100" min="0" max="100" onchange="handleKab()">
+      </div>
       <br>
       <label for="diffuse-select">Diffuse reflection (kd):</label>
-      <span id="v-kd">1</span>
-      <input type="range" id="diffuse-select" value="100" min="0" max="100" style="float: right;" onchange="handleKd()">
+      <div style="float: right; display: flex;">
+        R<input type="range" id="diffuse-selectr" value="100" min="0" max="100" onchange="handleKdr()">
+        G<input type="range" id="diffuse-selectg" value="100" min="0" max="100" onchange="handleKdg()">
+        B<input type="range" id="diffuse-selectb" value="100" min="0" max="100" onchange="handleKdb()">
+      </div>
       <br>
       <label for="specular-select">Specular reflection (ks):</label>
-      <span id="v-ks">1</span>
-      <input type="range" id="specular-select" value="100" min="0" max="100" style="float: right;"
-        onchange="handleKs()">
+      <div style="float: right; display: flex;">
+        R<input type="range" id="specular-selectr" value="100" min="0" max="100" onchange="handleKsr()">
+        G<input type="range" id="specular-selectg" value="100" min="0" max="100" onchange="handleKsg()">
+        B<input type="range" id="specular-selectb" value="100" min="0" max="100" onchange="handleKsb()">
+      </div>
     </div>
     <div style="border: solid 1px #000000; padding: 10px; width: 45%;">
       <label for="material-select">Choose Material:</label>
       <select name="materials" id="material-select">
         <option value="0">Red plastic</option>
         <option value="1">Green plastic</option>
-        <option value="2">None</option>
+        <option value="2">Blue plastic</option>
+        <option value="3">None</option>
       </select>
       <br>
       <div>Light position:</div>
